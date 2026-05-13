@@ -11,6 +11,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import WeatherForecast from "./WeatherForecast";
 
 type Stage = "Seedling" | "Vegetative" | "Flowering";
 type Mode = "Auto" | "Manual";
