@@ -11,6 +11,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import WeatherForecast from "./WeatherForecast";
 
 type Stage = "Seedling" | "Vegetative" | "Flowering";
 type Mode = "Auto" | "Manual";
@@ -357,6 +358,9 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* 3-Day Smart Weather Forecast */}
+        <WeatherForecast stage={stage} />
 
         {/* Alerts */}
         <div className="glass-card rounded-3xl p-6 md:col-span-2 lg:col-span-4">
