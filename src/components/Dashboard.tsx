@@ -359,6 +359,9 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* 3-Day Smart Weather Forecast */}
+        <WeatherForecast stage={stage} />
+
         {/* Alerts */}
         <div className="glass-card rounded-3xl p-6 md:col-span-2 lg:col-span-4">
           <div className="mb-4 flex items-center gap-2">
