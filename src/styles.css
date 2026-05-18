@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -10,6 +11,7 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -37,54 +39,46 @@
 }
 
 :root {
-  --radius: 0.875rem;
+  --radius: 1rem;
 
-  /* Deep agritech night palette */
-  --background: oklch(0.18 0.03 160);
-  --foreground: oklch(0.97 0.02 130);
+  /* Clean, light award-winning palette */
+  --background: oklch(0.99 0.01 250);
+  --foreground: oklch(0.2 0.02 250);
 
-  --card: oklch(0.23 0.035 160);
-  --card-foreground: oklch(0.97 0.02 130);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.02 250);
 
-  --popover: oklch(0.23 0.035 160);
-  --popover-foreground: oklch(0.97 0.02 130);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.02 250);
 
-  --primary: oklch(0.78 0.18 145);
-  --primary-foreground: oklch(0.18 0.05 160);
+  /* Primary: Indigo/Purple-ish like the reference for a modern SaaS look */
+  --primary: oklch(0.55 0.22 265);
+  --primary-foreground: oklch(0.98 0.01 250);
 
-  --secondary: oklch(0.3 0.04 165);
-  --secondary-foreground: oklch(0.97 0.02 130);
+  --secondary: oklch(0.96 0.01 250);
+  --secondary-foreground: oklch(0.3 0.02 250);
 
-  --muted: oklch(0.27 0.03 165);
-  --muted-foreground: oklch(0.72 0.03 145);
+  --muted: oklch(0.97 0.01 250);
+  --muted-foreground: oklch(0.55 0.02 250);
 
-  --accent: oklch(0.32 0.06 160);
-  --accent-foreground: oklch(0.97 0.02 130);
+  --accent: oklch(0.96 0.01 250);
+  --accent-foreground: oklch(0.3 0.02 250);
 
-  --destructive: oklch(0.65 0.22 25);
+  --destructive: oklch(0.6 0.2 25);
   --destructive-foreground: oklch(0.98 0.01 90);
 
-  --border: oklch(0.3 0.03 160 / 60%);
-  --input: oklch(0.3 0.03 160);
-  --ring: oklch(0.78 0.18 145);
+  --border: oklch(0.92 0.01 250);
+  --input: oklch(0.92 0.01 250);
+  --ring: oklch(0.55 0.22 265);
 
-  --sun: oklch(0.85 0.17 90);
-  --leaf: oklch(0.78 0.18 145);
-  --water: oklch(0.78 0.13 220);
-  --warning: oklch(0.82 0.16 70);
-  --success: oklch(0.78 0.18 145);
+  --sun: oklch(0.7 0.17 70);
+  --leaf: oklch(0.65 0.18 150);
+  --water: oklch(0.65 0.15 240);
+  --warning: oklch(0.75 0.16 60);
+  --success: oklch(0.65 0.18 150);
 
-  --gradient-bg: radial-gradient(1200px 600px at 10% -10%, oklch(0.3 0.08 145 / 0.5), transparent 60%),
-                 radial-gradient(900px 500px at 100% 10%, oklch(0.32 0.1 90 / 0.35), transparent 60%),
-                 linear-gradient(180deg, oklch(0.16 0.03 160), oklch(0.2 0.04 165));
-  --gradient-leaf: linear-gradient(135deg, oklch(0.78 0.18 145), oklch(0.65 0.16 165));
-  --gradient-sun: linear-gradient(135deg, oklch(0.88 0.18 90), oklch(0.78 0.2 60));
-  --gradient-water: linear-gradient(135deg, oklch(0.78 0.13 220), oklch(0.65 0.14 250));
-  --gradient-card: linear-gradient(180deg, oklch(0.25 0.035 160 / 0.9), oklch(0.21 0.03 160 / 0.9));
-
-  --shadow-glow-leaf: 0 10px 40px -10px oklch(0.78 0.18 145 / 0.45);
-  --shadow-glow-sun: 0 10px 40px -10px oklch(0.85 0.17 90 / 0.4);
-  --shadow-soft: 0 12px 40px -18px oklch(0 0 0 / 0.6);
+  --shadow-soft: 0 4px 20px -2px oklch(0 0 0 / 0.04), 0 1px 3px -1px oklch(0 0 0 / 0.02);
+  --shadow-hover: 0 8px 30px -4px oklch(0 0 0 / 0.08), 0 4px 10px -2px oklch(0 0 0 / 0.04);
 }
 
 @layer base {
@@ -93,9 +87,9 @@
   }
 
   body {
-    background: var(--gradient-bg);
-    background-attachment: fixed;
+    background: var(--background);
     color: var(--color-foreground);
+    font-family: 'Inter', sans-serif;
     font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
   }
@@ -103,31 +97,28 @@
 
 @layer utilities {
   .glass-card {
-    background: var(--gradient-card);
-    backdrop-filter: blur(18px);
-    border: 1px solid oklch(1 0 0 / 0.06);
+    background: var(--card);
+    border: 1px solid var(--color-border);
     box-shadow: var(--shadow-soft);
   }
-  .grad-leaf { background: var(--gradient-leaf); }
-  .grad-sun { background: var(--gradient-sun); }
-  .grad-water { background: var(--gradient-water); }
-  .glow-leaf { box-shadow: var(--shadow-glow-leaf); }
-  .glow-sun { box-shadow: var(--shadow-glow-sun); }
+  .glass-card:hover {
+    box-shadow: var(--shadow-hover);
+  }
   .text-sun { color: var(--color-sun); }
   .text-leaf { color: var(--color-leaf); }
   .text-water { color: var(--color-water); }
   .text-warning { color: var(--color-warning); }
 
+  .bg-sun-soft { background-color: oklch(0.7 0.17 70 / 0.1); }
+  .bg-leaf-soft { background-color: oklch(0.65 0.18 150 / 0.1); }
+  .bg-water-soft { background-color: oklch(0.65 0.15 240 / 0.1); }
+  .bg-warning-soft { background-color: oklch(0.75 0.16 60 / 0.1); }
+  .bg-primary-soft { background-color: oklch(0.55 0.22 265 / 0.1); }
+
   @keyframes pulse-ring {
-    0% { box-shadow: 0 0 0 0 oklch(0.78 0.18 145 / 0.5); }
-    70% { box-shadow: 0 0 0 14px oklch(0.78 0.18 145 / 0); }
-    100% { box-shadow: 0 0 0 0 oklch(0.78 0.18 145 / 0); }
+    0% { box-shadow: 0 0 0 0 oklch(0.65 0.18 150 / 0.4); }
+    70% { box-shadow: 0 0 0 10px oklch(0.65 0.18 150 / 0); }
+    100% { box-shadow: 0 0 0 0 oklch(0.65 0.18 150 / 0); }
   }
   .pulse-ring { animation: pulse-ring 2s infinite; }
-
-  @keyframes float-slow {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-  .float-slow { animation: float-slow 6s ease-in-out infinite; }
 }
