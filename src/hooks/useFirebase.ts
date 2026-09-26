@@ -28,6 +28,12 @@ export interface FirebaseState {
   lux: number;
   hoursLit: number;
   soilMoisture: number;
+  mq2: number;
+  soil1: number;
+  soil2: number;
+  lightRaw: number;
+  ledBrightness: number;
+  lastUpdated: string | null;
 
   // ── Control state ─────────────────────────────────────────────
   mode: Mode;
@@ -53,6 +59,11 @@ const DEFAULTS = {
   lux: 18000,
   hoursLit: 6.2,
   soilMoisture: 42,
+  mq2: 340,
+  soil1: 2150,
+  soil2: 2280,
+  lightRaw: 1650,
+  ledBrightness: 0,
   mode: "Auto" as Mode,
   ledOn: false,
   ledIntensity: 0,
@@ -65,6 +76,13 @@ export function useFirebase(): FirebaseState {
   const [lux, setLux] = useState(DEFAULTS.lux);
   const [hoursLit, setHoursLit] = useState(DEFAULTS.hoursLit);
   const [soilMoisture, setSoilMoisture] = useState(DEFAULTS.soilMoisture);
+  const [mq2, setMq2] = useState(DEFAULTS.mq2);
+  const [soil1, setSoil1] = useState(DEFAULTS.soil1);
+  const [soil2, setSoil2] = useState(DEFAULTS.soil2);
+  const [lightRaw, setLightRaw] = useState(DEFAULTS.lightRaw);
+  const [ledBrightness, setLedBrightness] = useState(DEFAULTS.ledBrightness);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+
   const [mode, setModeState] = useState<Mode>(DEFAULTS.mode);
   const [ledOn, setLedOnState] = useState(DEFAULTS.ledOn);
   const [ledIntensity, setLedIntensityState] = useState(DEFAULTS.ledIntensity);
@@ -74,23 +92,27 @@ export function useFirebase(): FirebaseState {
 
   // Track how many sensor paths have returned at least once
   const arrivedCount = useRef(0);
-  const TOTAL_PATHS = 9; // 5 sensors + 4 controls
 
   function markArrived() {
     arrivedCount.current += 1;
-    if (arrivedCount.current >= TOTAL_PATHS) {
-      setLoading(false);
-      setConnected(true);
-    }
+    // Mark connected as soon as at least one real value is received from Firebase
+    setLoading(false);
+    setConnected(true);
+    setLastUpdated(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
   }
 
   useEffect(() => {
     // ── Sensor listeners ──────────────────────────────────────────
-    const tempRef = ref(db, "sensors/temperature");
-    const humRef  = ref(db, "sensors/humidity");
-    const luxRef  = ref(db, "sensors/lux");
-    const litRef  = ref(db, "sensors/hoursLit");
-    const soilRef = ref(db, "sensors/soilMoisture");
+    const tempRef     = ref(db, "sensors/temperature");
+    const humRef      = ref(db, "sensors/humidity");
+    const luxRef      = ref(db, "sensors/lux");
+    const litRef      = ref(db, "sensors/hoursLit");
+    const soilRef     = ref(db, "sensors/soilMoisture");
+    const mq2Ref      = ref(db, "sensors/mq2");
+    const soil1Ref    = ref(db, "sensors/soil1");
+    const soil2Ref    = ref(db, "sensors/soil2");
+    const lightRawRef = ref(db, "sensors/lightRaw");
+    const ledBriRef   = ref(db, "sensors/ledBrightness");
 
     const unsubTemp = onValue(tempRef, (snap) => {
       const v = snap.val();
@@ -119,6 +141,36 @@ export function useFirebase(): FirebaseState {
     const unsubSoil = onValue(soilRef, (snap) => {
       const v = snap.val();
       if (v !== null && typeof v === "number") setSoilMoisture(v);
+      markArrived();
+    });
+
+    const unsubMq2 = onValue(mq2Ref, (snap) => {
+      const v = snap.val();
+      if (v !== null && typeof v === "number") setMq2(v);
+      markArrived();
+    });
+
+    const unsubSoil1 = onValue(soil1Ref, (snap) => {
+      const v = snap.val();
+      if (v !== null && typeof v === "number") setSoil1(v);
+      markArrived();
+    });
+
+    const unsubSoil2 = onValue(soil2Ref, (snap) => {
+      const v = snap.val();
+      if (v !== null && typeof v === "number") setSoil2(v);
+      markArrived();
+    });
+
+    const unsubLightRaw = onValue(lightRawRef, (snap) => {
+      const v = snap.val();
+      if (v !== null && typeof v === "number") setLightRaw(v);
+      markArrived();
+    });
+
+    const unsubLedBri = onValue(ledBriRef, (snap) => {
+      const v = snap.val();
+      if (v !== null && typeof v === "number") setLedBrightness(v);
       markArrived();
     });
 
@@ -159,6 +211,11 @@ export function useFirebase(): FirebaseState {
       unsubLux();
       unsubLit();
       unsubSoil();
+      unsubMq2();
+      unsubSoil1();
+      unsubSoil2();
+      unsubLightRaw();
+      unsubLedBri();
       unsubMode();
       unsubLedOn();
       unsubLedInt();
@@ -202,6 +259,12 @@ export function useFirebase(): FirebaseState {
     lux,
     hoursLit,
     soilMoisture,
+    mq2,
+    soil1,
+    soil2,
+    lightRaw,
+    ledBrightness,
+    lastUpdated,
     mode,
     ledOn,
     ledIntensity,
