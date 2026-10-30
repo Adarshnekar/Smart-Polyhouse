@@ -42,85 +42,124 @@ const generateHourlyData = (baseTemp: number) => {
   return data;
 };
 
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ name: string; value: number; color: string }>;
+  label?: string;
+}
+
+const CustomChartTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-xl border border-[#E8E4D5] bg-[#FFFFFF] p-3.5 shadow-md backdrop-blur-md">
+        <p className="mb-2 text-xs font-bold text-[#17221B]">Time: {label}</p>
+        <div className="space-y-1.5">
+          {payload.map((entry, index) => (
+            <div key={`item-${index}`} className="flex items-center justify-between gap-4 text-xs font-medium">
+              <span className="flex items-center gap-1.5" style={{ color: entry.color }}>
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                {entry.name}:
+              </span>
+              <span className="font-bold text-[#17221B]">
+                {entry.name.includes("Temperature")
+                  ? `${entry.value}°C`
+                  : entry.name.includes("Voltage")
+                  ? `${entry.value} V`
+                  : `${(entry.value / 1000).toFixed(1)}k lux`}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function WeatherDetailsChart({ currentTemp = 28 }: { currentTemp?: number }) {
   const data = useMemo(() => generateHourlyData(currentTemp), [currentTemp]);
 
   return (
-    <div className="w-full h-full min-h-[400px] mt-6">
-      <ResponsiveContainer width="100%" height={400}>
+    <div className="w-full h-full min-h-[380px] mt-4 p-2 rounded-2xl bg-[#FCFCF8] border border-[#E8E4D5]">
+      <ResponsiveContainer width="100%" height={380}>
         <ComposedChart
           data={data}
           margin={{
             top: 20,
             right: 20,
-            bottom: 20,
-            left: 20,
+            bottom: 10,
+            left: 10,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
+          <defs>
+            <linearGradient id="luxGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#2F6B4F" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="#2F6B4F" stopOpacity={0.0} />
+            </linearGradient>
+            <linearGradient id="voltGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#D97706" stopOpacity={0.22} />
+              <stop offset="95%" stopColor="#D97706" stopOpacity={0.0} />
+            </linearGradient>
+          </defs>
+
+          <CartesianGrid strokeDasharray="3 3" stroke="#E8E4D5" vertical={false} />
           
           <XAxis 
             dataKey="time" 
-            stroke="hsl(var(--muted-foreground))"
-            fontSize={12}
+            stroke="#66756A"
+            fontSize={11}
             tickMargin={10}
-            minTickGap={20}
+            minTickGap={25}
           />
           
-          {/* Temperature Axis (Left) */}
+          {/* Temperature Axis (Left) - warm orange */}
           <YAxis 
             yAxisId="temp"
             orientation="left"
-            stroke="hsl(var(--destructive))"
+            stroke="#E6672E"
             tickFormatter={(val) => `${val}°C`}
-            fontSize={12}
+            fontSize={11}
             width={45}
+            tickLine={false}
           />
           
-          {/* Voltage Axis (Right Inner) */}
+          {/* Voltage Axis (Right Inner) - solar amber */}
           <YAxis 
             yAxisId="voltage"
             orientation="right"
-            stroke="hsl(var(--sun))"
+            stroke="#D97706"
             tickFormatter={(val) => `${val}V`}
-            fontSize={12}
+            fontSize={11}
             width={40}
+            tickLine={false}
           />
           
-          {/* Lux Axis (Right Outer) */}
+          {/* Lux Axis (Right Outer) - natural emerald */}
           <YAxis 
             yAxisId="lux"
             orientation="right"
-            stroke="hsl(var(--leaf))"
+            stroke="#2F6B4F"
             tickFormatter={(val) => `${val/1000}k`}
-            fontSize={12}
+            fontSize={11}
             width={45}
+            tickLine={false}
           />
 
-          <Tooltip
-            contentStyle={{
-              backgroundColor: 'hsl(var(--card))',
-              borderColor: 'hsl(var(--border))',
-              borderRadius: '12px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            }}
-            itemStyle={{ fontSize: '14px', fontWeight: 500 }}
-            labelStyle={{ color: 'hsl(var(--muted-foreground))', marginBottom: '8px' }}
-          />
+          <Tooltip content={<CustomChartTooltip />} />
           
           <Legend 
-            wrapperStyle={{ paddingTop: '20px' }}
+            wrapperStyle={{ paddingTop: '15px' }}
             iconType="circle"
           />
 
-          {/* Light Intensity (Area Chart to act as a backdrop for voltage) */}
+          {/* Light Intensity (Area Chart to act as backdrop) */}
           <Area 
             yAxisId="lux"
             type="monotone" 
             dataKey="lightIntensity" 
             name="Light Intensity (Lux)"
-            fill="hsl(var(--leaf)/0.2)" 
-            stroke="hsl(var(--leaf))" 
+            fill="url(#luxGradient)" 
+            stroke="#2F6B4F" 
             strokeWidth={2}
           />
           
@@ -130,21 +169,21 @@ export default function WeatherDetailsChart({ currentTemp = 28 }: { currentTemp?
             type="monotone" 
             dataKey="solarVoltage" 
             name="Solar Voltage (V)"
-            fill="hsl(var(--sun)/0.2)" 
-            stroke="hsl(var(--sun))" 
+            fill="url(#voltGradient)" 
+            stroke="#D97706" 
             strokeWidth={2}
           />
           
-          {/* Temperature (Line Chart) */}
+          {/* Temperature (Line Chart) - warm orange */}
           <Line 
             yAxisId="temp"
             type="monotone" 
             dataKey="temperature" 
             name="Temperature (°C)"
-            stroke="hsl(var(--destructive))" 
-            strokeWidth={3}
-            dot={{ r: 2, fill: "hsl(var(--destructive))" }}
-            activeDot={{ r: 6 }}
+            stroke="#E6672E" 
+            strokeWidth={2.5}
+            dot={false}
+            activeDot={{ r: 5, stroke: "#FCFCF8", strokeWidth: 2 }}
           />
           
         </ComposedChart>

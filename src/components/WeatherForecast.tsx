@@ -148,21 +148,36 @@ export default function WeatherForecast({ stage }: Props) {
   const predictions = useMemo(() => buildPredictions(forecast, stage), [forecast, stage]);
 
   return (
-    <div className="glass-card rounded-3xl p-6 md:col-span-2 lg:col-span-4">
-      <div className="mb-5 flex flex-wrap items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-soft text-primary">
-          <CloudSun className="h-6 w-6" />
+    <div className="glass-card rounded-2xl p-6 md:col-span-2 lg:col-span-4 border border-border relative overflow-hidden">
+      {/* Subtle Atmospheric Environmental Backdrop */}
+      <div 
+        aria-hidden="true"
+        className="absolute top-0 left-0 right-0 h-32 opacity-12 pointer-events-none bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/weather_sky.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFFFFF]/80 to-[#FFFFFF]" />
+      </div>
+
+      <div className="relative z-10 mb-5 flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-border/60">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-soft text-primary border border-primary/20 shadow-xs">
+            <CloudSun className="h-6 w-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Meteorological Integration</span>
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-leaf" />
+              <span className="text-xs font-medium text-leaf">Active Station · Mysore</span>
+            </div>
+            <h3 className="text-xl font-bold text-foreground">3-Day Smart Weather Forecast & Predictive Automation</h3>
+          </div>
         </div>
-        <div>
-          <h3 className="text-xl font-bold leading-tight text-foreground">3-Day Smart Forecast</h3>
-          <p className="mt-1 text-sm font-medium text-muted-foreground">AI-driven predictive greenhouse planning</p>
-        </div>
-        <Badge className="ml-auto bg-primary text-primary-foreground">
-          <Brain className="mr-1 h-3 w-3" /> Predictive AI
+        <Badge className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 text-xs py-1.5 px-3.5 font-semibold shadow-xs">
+          <Brain className="mr-1.5 h-3.5 w-3.5" /> Autonomous Climate Advisory
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {forecast.map((f, i) => {
           const isPlanning = f.label === "Tomorrow";
           const isLive = f.label === "Today";
@@ -170,52 +185,60 @@ export default function WeatherForecast({ stage }: Props) {
           const cardContent = (
             <div
               key={f.day}
-              className={`relative overflow-hidden rounded-3xl border p-5 transition-all ${
+              className={`relative overflow-hidden rounded-xl border p-5 transition-all ${
                 isPlanning
-                  ? "border-primary/30 bg-primary/5 shadow-sm"
-                  : "border-border/50 bg-secondary/30 hover:shadow-sm"
-              } ${isLive ? "cursor-pointer hover:border-primary/50" : ""}`}
+                  ? "border-primary/40 bg-primary/5 shadow-xs"
+                  : "border-border bg-card hover:border-primary/40 hover:shadow-xs"
+              } ${isLive ? "cursor-pointer" : ""}`}
             >
               {isPlanning && (
-                <div className="absolute right-3 top-3">
-                  <Badge className="bg-primary text-primary-foreground text-[10px] uppercase tracking-wider">
+                <div className="absolute right-3.5 top-3.5">
+                  <Badge className="bg-primary text-primary-foreground text-[10px] uppercase font-bold tracking-wider">
                     <CalendarDays className="mr-1 h-3 w-3" /> Planning Day
                   </Badge>
                 </div>
               )}
               {isLive && (
-                <div className="absolute right-3 top-3">
-                  <Badge className="bg-leaf text-primary-foreground text-[10px] uppercase tracking-wider">
-                    <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-background animate-pulse" /> Live Data
+                <div className="absolute right-3.5 top-3.5">
+                  <Badge className="bg-leaf text-white text-[10px] uppercase font-bold tracking-wider">
+                    <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-white animate-pulse" /> Live Telemetry
                   </Badge>
                 </div>
               )}
               <div className="mb-3 flex items-center gap-3">
-                <ConditionIcon c={f.condition} className="h-9 w-9" />
+                <ConditionIcon c={f.condition} className="h-8 w-8" />
                 <div>
-                  <p className="text-sm text-muted-foreground">{f.label}</p>
-                  <p className="text-base font-semibold">{f.condition}</p>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{f.label}</p>
+                  <p className="text-base font-bold text-foreground">{f.condition}</p>
                 </div>
               </div>
 
-              <div className="mb-3 flex items-end gap-2">
-                <p className="text-3xl font-bold tracking-tight">{f.tempMax}°</p>
-                <p className="pb-1 text-sm text-muted-foreground">/ {f.tempMin}°C</p>
+              <div className="mb-3 flex items-baseline gap-2">
+                <p className="text-3xl font-bold tracking-tight text-foreground">{f.tempMax}°C</p>
+                <p className="text-sm font-medium text-muted-foreground">/ min {f.tempMin}°C</p>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <Metric icon={<Cloud className="h-3.5 w-3.5" />} label="Cloud" value={`${f.cloudCover}%`} tone={severity("cloud", f.cloudCover)} />
-                <Metric icon={<Sun className="h-3.5 w-3.5" />}    label="UV"    value={`${f.uv}`}             tone={severity("uv", f.uv)} />
+                <Metric icon={<Sun className="h-3.5 w-3.5" />}    label="UV Index" value={`${f.uv}`}          tone={severity("uv", f.uv)} />
                 <Metric icon={<Droplets className="h-3.5 w-3.5" />} label="Rain" value={`${f.rain}%`}        tone={severity("rain", f.rain)} />
                 <Metric icon={<Wind className="h-3.5 w-3.5" />}   label="Wind"  value={`${f.wind} km/h`}    tone="leaf" />
               </div>
 
-              <div className="mt-3">
-                <div className="mb-1 flex justify-between text-[10px] uppercase tracking-wider text-muted-foreground">
-                  <span>Rain probability</span><span>{f.rain}%</span>
+              <div className="mt-3.5 pt-3 border-t border-border/50">
+                <div className="mb-1.5 flex justify-between text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
+                  <span>Precipitation Risk</span>
+                  <span className="font-semibold text-foreground">{f.rain}%</span>
                 </div>
-                <Progress value={f.rain} className="h-1.5" />
+                <Progress value={f.rain} className="h-1.5 bg-secondary" />
               </div>
+
+              {isLive && (
+                <p className="mt-3 text-[11px] font-semibold text-primary flex items-center gap-1">
+                  <span>Click to view 24h solar & temperature curves</span>
+                  <span aria-hidden="true">→</span>
+                </p>
+              )}
             </div>
           );
 
@@ -223,18 +246,18 @@ export default function WeatherForecast({ stage }: Props) {
             return (
               <Dialog key={f.day}>
                 <DialogTrigger asChild>
-                  <div role="button" tabIndex={0} className="w-full text-left">
+                  <div role="button" tabIndex={0} className="w-full text-left focus:outline-hidden">
                     {cardContent}
                   </div>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-4xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto rounded-2xl">
                   <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
-                      <Sun className="h-6 w-6 text-sun" />
-                      Detailed Hourly Comparison
+                    <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                      <Sun className="h-5 w-5 text-sun" />
+                      24-Hour Solar Radiation & Thermal Dynamics
                     </DialogTitle>
-                    <DialogDescription className="text-base">
-                      Interactive comparison of hourly weather conditions, simulated solar panel output voltage, and light intensity.
+                    <DialogDescription className="text-sm text-muted-foreground">
+                      Continuous telemetry projection correlating ambient temperature, simulated photovoltaic output, and canopy lux.
                     </DialogDescription>
                   </DialogHeader>
                   <WeatherDetailsChart currentTemp={f.tempMax} />
@@ -248,28 +271,32 @@ export default function WeatherForecast({ stage }: Props) {
       </div>
 
       {/* Predictive AI decisions */}
-      <div className="mt-6 rounded-3xl border border-border/60 bg-secondary/40 p-5">
-        <div className="mb-4 flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-primary">
-            <Sparkles className="h-5 w-5" />
-          </span>
-          <h4 className="text-lg font-bold text-foreground">Automated Predictive Decisions</h4>
-          <Badge variant="outline" className="ml-auto border-primary/20 text-primary bg-primary/5 text-xs">
-            {predictions.length} actions queued
+      <div className="mt-6 rounded-xl border border-border/80 bg-secondary/30 p-5">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-soft text-primary">
+              <Sparkles className="h-4 w-4" />
+            </span>
+            <h4 className="text-base font-bold text-foreground">Predictive Automation Directives</h4>
+          </div>
+          <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 text-xs font-semibold">
+            {predictions.length} Directives Queued
           </Badge>
         </div>
-        <ul className="grid gap-2 md:grid-cols-2">
+        <ul className="grid gap-2.5 md:grid-cols-2">
           {predictions.map((p, i) => (
-            <li key={i} className={`flex items-start gap-4 rounded-2xl border p-4 ${toneClasses(p.tone)}`}>
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background/60 shadow-sm">
+            <li key={i} className={`flex items-start gap-3.5 rounded-xl border p-3.5 ${toneClasses(p.tone)}`}>
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-card shadow-2xs">
                 {p.icon}
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-base font-bold text-foreground">{p.title}</p>
-                  <span className="text-xs font-semibold text-muted-foreground bg-background/40 px-2 py-0.5 rounded-full">{p.when}</span>
+                  <p className="text-sm font-bold text-foreground">{p.title}</p>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-card/80 px-2 py-0.5 rounded-md border border-border/40">
+                    {p.when}
+                  </span>
                 </div>
-                <p className="mt-1 text-sm font-medium text-muted-foreground leading-relaxed">{p.detail}</p>
+                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{p.detail}</p>
               </div>
             </li>
           ))}
