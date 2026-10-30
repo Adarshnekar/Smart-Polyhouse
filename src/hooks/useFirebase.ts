@@ -33,6 +33,7 @@ export interface FirebaseState {
   soil2: number;
   lightRaw: number;
   ledBrightness: number;
+  solarVoltage: number;
   lastUpdated: string | null;
 
   // ── Control state ─────────────────────────────────────────────
@@ -64,6 +65,7 @@ const DEFAULTS = {
   soil2: 2280,
   lightRaw: 1650,
   ledBrightness: 0,
+  solarVoltage: 18.2,
   mode: "Auto" as Mode,
   ledOn: false,
   ledIntensity: 0,
@@ -81,6 +83,7 @@ export function useFirebase(): FirebaseState {
   const [soil2, setSoil2] = useState(DEFAULTS.soil2);
   const [lightRaw, setLightRaw] = useState(DEFAULTS.lightRaw);
   const [ledBrightness, setLedBrightness] = useState(DEFAULTS.ledBrightness);
+  const [solarVoltage, setSolarVoltage] = useState(DEFAULTS.solarVoltage);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
   const [mode, setModeState] = useState<Mode>(DEFAULTS.mode);
@@ -113,6 +116,7 @@ export function useFirebase(): FirebaseState {
     const soil2Ref    = ref(db, "sensors/soil2");
     const lightRawRef = ref(db, "sensors/lightRaw");
     const ledBriRef   = ref(db, "sensors/ledBrightness");
+    const solarRef    = ref(db, "sensors/solarVoltage");
 
     const unsubTemp = onValue(tempRef, (snap) => {
       const v = snap.val();
@@ -168,6 +172,12 @@ export function useFirebase(): FirebaseState {
       markArrived();
     });
 
+    const unsubSolar = onValue(solarRef, (snap) => {
+      const v = snap.val();
+      if (v !== null && typeof v === "number") setSolarVoltage(v);
+      markArrived();
+    });
+
     const unsubLedBri = onValue(ledBriRef, (snap) => {
       const v = snap.val();
       if (v !== null && typeof v === "number") setLedBrightness(v);
@@ -216,6 +226,7 @@ export function useFirebase(): FirebaseState {
       unsubSoil2();
       unsubLightRaw();
       unsubLedBri();
+      unsubSolar();
       unsubMode();
       unsubLedOn();
       unsubLedInt();
@@ -264,6 +275,7 @@ export function useFirebase(): FirebaseState {
     soil2,
     lightRaw,
     ledBrightness,
+    solarVoltage,
     lastUpdated,
     mode,
     ledOn,

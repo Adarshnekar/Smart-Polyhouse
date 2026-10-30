@@ -92,6 +92,7 @@ export default function Dashboard() {
     soil2,
     lightRaw,
     ledBrightness,
+    solarVoltage,
     lastUpdated,
     mode,
     ledOn,
@@ -164,6 +165,7 @@ export default function Dashboard() {
     profile.humidityMin,
     profile.humidityMax,
   ];
+
 
   // ── Energy ──────────────────────────────────────────────────────
   const totalLightHours = hoursLit + ledHoursToday;
@@ -577,7 +579,7 @@ export default function Dashboard() {
               SECTION 1 — SYSTEM OVERVIEW CARD (Always prominent)
           ──────────────────────────────────────────────────────── */}
           {(activeSection === "Dashboard" || activeSection === "Environment") && (
-            <div className="glass-card rounded-3xl p-6 border border-border shadow-xs relative overflow-hidden">
+            <div className="glass-card rounded-3xl p-4 sm:p-5 border border-border shadow-xs relative overflow-hidden">
               {/* Subtle Agricultural Image Watermark / Atmosphere */}
               <div 
                 aria-hidden="true"
@@ -585,7 +587,7 @@ export default function Dashboard() {
                 style={{ backgroundImage: "url('/images/greenhouse_interior.jpg')" }}
               />
               <div className="relative z-10">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between pb-5 border-b border-border/60">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between pb-3.5 border-b border-border/60">
                   <div className="space-y-1">
                     <div className="flex flex-wrap items-center gap-2.5">
                       <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -621,65 +623,83 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-              {/* 5-Metric Quick Telemetry Strip */}
-              <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                <div className="rounded-xl border border-border/60 bg-secondary/30 p-3.5">
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                    <Thermometer className="h-3.5 w-3.5 text-warning" /> Temperature
+              {/* 6-Metric Primary Telemetry Grid (2 Rows x 3 Columns) */}
+              <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                {/* 1. Ambient Temperature */}
+                <div className="rounded-xl border border-border/70 bg-white shadow-xs hover:shadow-sm transition-all py-2.5 px-3.5">
+                  <span className="flex items-center gap-1.5 text-[13px] font-bold text-foreground/80">
+                    <Thermometer className="h-4.5 w-4.5 text-warning" /> Temperature
                   </span>
-                  <p className="mt-1 text-xl font-bold text-foreground tracking-tight">
-                    {temp} <span className="text-xs font-normal text-muted-foreground">°C</span>
+                  <p className="mt-0.5 text-3xl font-extrabold text-foreground tracking-tight tabular-nums">
+                    {temp} <span className="text-xs font-semibold text-muted-foreground">°C</span>
                   </p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">
-                    Target: {profile.tempDayMin}–{profile.tempDayMax}°C
+                  <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                    Target: <span className="font-semibold text-foreground/90">{profile.tempDayMin}–{profile.tempDayMax}°C</span>
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-border/60 bg-secondary/30 p-3.5">
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                    <Droplets className="h-3.5 w-3.5 text-water" /> Humidity
+                {/* 2. Relative Humidity */}
+                <div className="rounded-xl border border-border/70 bg-white shadow-xs hover:shadow-sm transition-all py-2.5 px-3.5">
+                  <span className="flex items-center gap-1.5 text-[13px] font-bold text-foreground/80">
+                    <Droplets className="h-4.5 w-4.5 text-water" /> Humidity
                   </span>
-                  <p className="mt-1 text-xl font-bold text-foreground tracking-tight">
-                    {humidity} <span className="text-xs font-normal text-muted-foreground">%</span>
+                  <p className="mt-0.5 text-3xl font-extrabold text-foreground tracking-tight tabular-nums">
+                    {humidity} <span className="text-xs font-semibold text-muted-foreground">%</span>
                   </p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">
-                    Target: {profile.humidityMin}–{profile.humidityMax}%
+                  <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                    Target: <span className="font-semibold text-foreground/90">{profile.humidityMin}–{profile.humidityMax}%</span>
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-border/60 bg-secondary/30 p-3.5">
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                    <Sprout className="h-3.5 w-3.5 text-leaf" /> Soil Moisture
+                {/* 3. Soil Moisture */}
+                <div className="rounded-xl border border-border/70 bg-white shadow-xs hover:shadow-sm transition-all py-2.5 px-3.5">
+                  <span className="flex items-center gap-1.5 text-[13px] font-bold text-foreground/80">
+                    <Sprout className="h-4.5 w-4.5 text-leaf" /> Soil Moisture
                   </span>
-                  <p className="mt-1 text-xl font-bold text-foreground tracking-tight">
-                    {soilMoisture} <span className="text-xs font-normal text-muted-foreground">%</span>
+                  <p className="mt-0.5 text-3xl font-extrabold text-foreground tracking-tight tabular-nums">
+                    {soilMoisture} <span className="text-xs font-semibold text-muted-foreground">%</span>
                   </p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">
-                    Probes: S1 ({soil1}) · S2 ({soil2})
+                  <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                    Probes: <span className="font-semibold text-foreground/90">S1 ({soil1}) · S2 ({soil2})</span>
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-border/60 bg-secondary/30 p-3.5">
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                    <Sun className="h-3.5 w-3.5 text-sun" /> Canopy Light
+                {/* 4. Canopy Light */}
+                <div className="rounded-xl border border-border/70 bg-white shadow-xs hover:shadow-sm transition-all py-2.5 px-3.5">
+                  <span className="flex items-center gap-1.5 text-[13px] font-bold text-foreground/80">
+                    <Sun className="h-4.5 w-4.5 text-sun" /> Canopy Light
                   </span>
-                  <p className="mt-1 text-xl font-bold text-foreground tracking-tight">
-                    {(lux / 1000).toFixed(1)}k <span className="text-xs font-normal text-muted-foreground">lux</span>
+                  <p className="mt-0.5 text-3xl font-extrabold text-foreground tracking-tight tabular-nums">
+                    {(lux / 1000).toFixed(1)}k <span className="text-xs font-semibold text-muted-foreground">lux</span>
                   </p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">
-                    Target: {profile.luxMin / 1000}k–{profile.luxMax / 1000}k
+                  <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                    Target: <span className="font-semibold text-foreground/90">{profile.luxMin / 1000}k–{profile.luxMax / 1000}k</span>
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-border/60 bg-secondary/30 p-3.5 col-span-2 sm:col-span-1">
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                    <Flame className="h-3.5 w-3.5 text-primary" /> Air / MQ-2
+                {/* 5. Air Quality & Gas (MQ-2) */}
+                <div className="rounded-xl border border-border/70 bg-white shadow-xs hover:shadow-sm transition-all py-2.5 px-3.5">
+                  <span className="flex items-center gap-1.5 text-[13px] font-bold text-foreground/80">
+                    <Flame className="h-4.5 w-4.5 text-primary" /> Air / MQ-2
                   </span>
-                  <p className="mt-1 text-xl font-bold text-foreground tracking-tight">
-                    {mq2} <span className="text-xs font-normal text-muted-foreground">ADC</span>
+                  <p className="mt-0.5 text-3xl font-extrabold text-foreground tracking-tight tabular-nums">
+                    {mq2} <span className="text-xs font-semibold text-muted-foreground">ADC</span>
                   </p>
-                  <p className="mt-0.5 text-[11px] text-leaf font-medium">
+                  <p className="mt-0.5 text-xs text-leaf font-semibold">
                     Status: Normal (Safe)
+                  </p>
+                </div>
+
+                {/* 6. Solar Panel Voltage */}
+                <div className="rounded-xl border border-border/70 bg-white shadow-xs hover:shadow-sm transition-all py-2.5 px-3.5">
+                  <span className="flex items-center gap-1.5 text-[13px] font-bold text-foreground/80">
+                    <Zap className="h-4.5 w-4.5 text-sun" /> Solar Panel Voltage
+                  </span>
+                  <p className="mt-0.5 text-3xl font-extrabold text-foreground tracking-tight tabular-nums">
+                    {solarVoltage} <span className="text-xs font-semibold text-muted-foreground">V</span>
+                  </p>
+                  <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                    Target: <span className="font-semibold text-foreground/90">14.0–19.5V (Active PV)</span>
                   </p>
                 </div>
               </div>
@@ -687,112 +707,113 @@ export default function Dashboard() {
           </div>
         )}
 
-          {/* ────────────────────────────────────────────────────────
-              SENSOR CARDS SECTION
-          ──────────────────────────────────────────────────────── */}
-          {(activeSection === "Dashboard" || activeSection === "Environment") && (
-            <div>
-              <div className="mb-3 flex items-center justify-between">
-                <div>
-                  <h4 className="text-base font-bold text-foreground">Sensory Telemetry Grid</h4>
-                  <p className="text-xs text-muted-foreground">Calibrated hardware inputs streamed from ESP32</p>
-                </div>
-                <Badge variant="outline" className="text-xs font-semibold">
-                  5 Active Hardware Nodes
-                </Badge>
+        {/* ────────────────────────────────────────────────────────
+            SENSOR CARDS SECTION (ENVIRONMENT PAGE ONLY)
+        ──────────────────────────────────────────────────────── */}
+        {activeSection === "Environment" && (
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <h4 className="text-base font-bold text-foreground">Sensory Telemetry Grid</h4>
+                <p className="text-xs text-muted-foreground">Calibrated hardware inputs streamed from ESP32</p>
               </div>
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {/* 1. Ambient Temperature */}
-                <SensorCard
-                  title="Ambient Temperature"
-                  subtitle="DHT11 Dual Averaged Array (GPIO 26 & 33)"
-                  value={`${temp}`}
-                  unit="°C"
-                  status={tempStatus === "Normal" ? "Normal" : tempStatus === "High" ? "Warning" : "Critical"}
-                  targetRange={`${profile.tempDayMin} – ${profile.tempDayMax}°C`}
-                  icon={<Thermometer className="h-5 w-5 text-warning" />}
-                  tone="warning"
-                  live={connected}
-                  lastUpdate={lastUpdated}
-                />
-
-                {/* 2. Relative Humidity */}
-                <SensorCard
-                  title="Relative Humidity"
-                  subtitle="DHT11 Atmospheric Sensor"
-                  value={`${humidity}`}
-                  unit="%"
-                  status={
-                    humidity >= profile.humidityMin && humidity <= profile.humidityMax
-                      ? "Normal"
-                      : "Warning"
-                  }
-                  targetRange={`${profile.humidityMin}% – ${profile.humidityMax}%`}
-                  icon={<Droplets className="h-5 w-5 text-water" />}
-                  tone="water"
-                  live={connected}
-                  lastUpdate={lastUpdated}
-                />
-
-                {/* 3. Soil Moisture */}
-                <SensorCard
-                  title="Soil Substrate Moisture"
-                  subtitle="Dual Capacitive Probes (GPIO 14 & 32)"
-                  value={`${soilMoisture}`}
-                  unit="%"
-                  status={soilMoisture >= 35 && soilMoisture <= 75 ? "Normal" : "Warning"}
-                  targetRange="40% – 70%"
-                  icon={<Sprout className="h-5 w-5 text-leaf" />}
-                  tone="leaf"
-                  live={connected}
-                  lastUpdate={lastUpdated}
-                />
-
-                {/* 4. Canopy Light Intensity */}
-                <SensorCard
-                  title="Canopy Light Intensity"
-                  subtitle="Dual LDR Photodiode Array (GPIO 27 & 25)"
-                  value={`${(lux / 1000).toFixed(1)}k`}
-                  unit="lux"
-                  status={lux >= profile.luxMin && lux <= profile.luxMax ? "Normal" : "Warning"}
-                  targetRange={`${profile.luxMin / 1000}k – ${profile.luxMax / 1000}k lux`}
-                  icon={<Sun className="h-5 w-5 text-sun" />}
-                  tone="sun"
-                  live={connected}
-                  lastUpdate={lastUpdated}
-                />
-
-                {/* 5. Air Quality & Gas (MQ-2) */}
-                <SensorCard
-                  title="Atmospheric Gas & Air Quality"
-                  subtitle="MQ-2 Gas / Smoke Sensor (GPIO 34)"
-                  value={`${mq2}`}
-                  unit="ADC"
-                  status={mq2 < 700 ? "Normal" : "Critical"}
-                  targetRange="Clean Air (< 700 ADC)"
-                  icon={<Flame className="h-5 w-5 text-primary" />}
-                  tone="leaf"
-                  live={connected}
-                  lastUpdate={lastUpdated}
-                />
-
-                {/* 6. Grow LED Status */}
-                <SensorCard
-                  title="Grow Light Array"
-                  subtitle="4-Channel PWM Output (GPIO 2, 4, 18, 19)"
-                  value={ledOn ? `${ledIntensity}` : "OFF"}
-                  unit={ledOn ? "%" : ""}
-                  status={ledOn ? "Normal" : "Normal"}
-                  targetRange={`Mode: ${mode} · ${ledHoursToday.toFixed(1)}h today`}
-                  icon={<Lightbulb className="h-5 w-5 text-leaf" />}
-                  tone="leaf"
-                  live={connected}
-                  lastUpdate={lastUpdated}
-                />
-              </div>
+              <Badge variant="outline" className="text-xs font-semibold">
+                5 Active Hardware Nodes
+              </Badge>
             </div>
-          )}
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {/* 1. Ambient Temperature */}
+              <SensorCard
+                title="Ambient Temperature"
+                subtitle="DHT11 Dual Averaged Array (GPIO 26 & 33)"
+                value={`${temp}`}
+                unit="°C"
+                status={tempStatus === "Normal" ? "Normal" : tempStatus === "High" ? "Warning" : "Critical"}
+                targetRange={`${profile.tempDayMin} – ${profile.tempDayMax}°C`}
+                icon={<Thermometer className="h-5 w-5 text-warning" />}
+                tone="warning"
+                live={connected}
+                lastUpdate={lastUpdated}
+              />
+
+              {/* 2. Relative Humidity */}
+              <SensorCard
+                title="Relative Humidity"
+                subtitle="DHT11 Atmospheric Sensor"
+                value={`${humidity}`}
+                unit="%"
+                status={
+                  humidity >= profile.humidityMin && humidity <= profile.humidityMax
+                    ? "Normal"
+                    : "Warning"
+                }
+                targetRange={`${profile.humidityMin}% – ${profile.humidityMax}%`}
+                icon={<Droplets className="h-5 w-5 text-water" />}
+                tone="water"
+                live={connected}
+                lastUpdate={lastUpdated}
+              />
+
+              {/* 3. Soil Moisture */}
+              <SensorCard
+                title="Soil Substrate Moisture"
+                subtitle="Dual Capacitive Probes (GPIO 14 & 32)"
+                value={`${soilMoisture}`}
+                unit="%"
+                status={soilMoisture >= 35 && soilMoisture <= 75 ? "Normal" : "Warning"}
+                targetRange="40% – 70%"
+                icon={<Sprout className="h-5 w-5 text-leaf" />}
+                tone="leaf"
+                live={connected}
+                lastUpdate={lastUpdated}
+              />
+
+              {/* 4. Canopy Light Intensity */}
+              <SensorCard
+                title="Canopy Light Intensity"
+                subtitle="Dual LDR Photodiode Array (GPIO 27 & 25)"
+                value={`${(lux / 1000).toFixed(1)}k`}
+                unit="lux"
+                status={lux >= profile.luxMin && lux <= profile.luxMax ? "Normal" : "Warning"}
+                targetRange={`${profile.luxMin / 1000}k – ${profile.luxMax / 1000}k lux`}
+                icon={<Sun className="h-5 w-5 text-sun" />}
+                tone="sun"
+                live={connected}
+                lastUpdate={lastUpdated}
+              />
+
+              {/* 5. Air Quality & Gas (MQ-2) */}
+              <SensorCard
+                title="Atmospheric Gas & Air Quality"
+                subtitle="MQ-2 Gas / Smoke Sensor (GPIO 34)"
+                value={`${mq2}`}
+                unit="ADC"
+                status={mq2 < 700 ? "Normal" : "Critical"}
+                targetRange="Clean Air (< 700 ADC)"
+                icon={<Flame className="h-5 w-5 text-primary" />}
+                tone="leaf"
+                live={connected}
+                lastUpdate={lastUpdated}
+              />
+
+              {/* 6. Grow LED Status */}
+              <SensorCard
+                title="Grow Light Array"
+                subtitle="4-Channel PWM Output (GPIO 2, 4, 18, 19)"
+                value={ledOn ? `${ledIntensity}` : "OFF"}
+                unit={ledOn ? "%" : ""}
+                status={ledOn ? "Normal" : "Normal"}
+                targetRange={`Mode: ${mode} · ${ledHoursToday.toFixed(1)}h today`}
+                icon={<Lightbulb className="h-5 w-5 text-leaf" />}
+                tone="leaf"
+                live={connected}
+                lastUpdate={lastUpdated}
+              />
+            </div>
+          </div>
+        )}
+
 
           {/* ────────────────────────────────────────────────────────
               SECTION: INDUSTRIAL IOT CONTROLS
@@ -893,12 +914,6 @@ export default function Dashboard() {
                       <span>100% (Full Spectrum)</span>
                     </div>
                   </div>
-
-                  {mode === "Auto" && (
-                    <p className="rounded-lg bg-primary/5 border border-primary/20 px-3 py-2 text-xs text-primary font-medium">
-                      ℹ️ Auto-adjust active: Brightness is dynamically calculated from stage deficit ({lux} lux vs target {profile.luxMax} lux).
-                    </p>
-                  )}
                 </div>
 
                 {/* 2. Misting & Humidity Control Panel */}
@@ -948,22 +963,24 @@ export default function Dashboard() {
                       {mistOn ? "Deactivate Misting" : "Trigger Manual Mist Pulse"}
                     </button>
                   </div>
-
-                  <p className="rounded-lg bg-water-soft/30 border border-water/20 px-3 py-2 text-xs text-water font-medium">
-                    {mode === "Auto"
-                      ? "ℹ️ Auto-trigger active: Misting cycles automatically when humidity drops below 60%."
-                      : "⚡ Manual mode enabled: You have full hardware override authority."}
-                  </p>
                 </div>
               </div>
 
               {/* Hardware write notice */}
               <div className="mt-5 flex items-center justify-between rounded-xl bg-leaf-soft/30 px-4 py-3 border border-leaf/20 text-xs">
                 <span className="flex items-center gap-2 text-leaf font-medium">
-                  <ShieldCheck className="h-4 w-4" />
-                  All actuator commands write to Firebase Realtime Database in real time and are polled by ESP32.
+                  <ShieldCheck className="h-4 w-4 shrink-0" />
+                  {mode === "Auto" ? (
+                    <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                      <span>Auto-adjust active: Brightness is dynamically calculated from stage deficit ({lux} lux vs target {profile.luxMax} lux).</span>
+                      <span className="hidden sm:inline text-leaf/50 font-bold">·</span>
+                      <span>Auto-trigger active: Misting cycles automatically when humidity drops below 60%.</span>
+                    </span>
+                  ) : (
+                    <span>Manual mode enabled: You have full hardware override authority.</span>
+                  )}
                 </span>
-                <span className="text-[11px] font-semibold text-muted-foreground hidden md:inline">
+                <span className="text-[11px] font-semibold text-muted-foreground hidden md:inline shrink-0 ml-4">
                   Hardware Node: Connected
                 </span>
               </div>
